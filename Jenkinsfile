@@ -10,7 +10,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the code using Maven...'
-                // Uncomment and adjust as needed
+                // Example command to build the project with Maven
                 // sh 'mvn clean package'
             }
         }
@@ -18,7 +18,7 @@ pipeline {
         stage('Unit and Integration Tests') {
             steps {
                 echo 'Running unit and integration tests...'
-                // Uncomment and adjust as needed
+                // Example command to run tests (JUnit, TestNG, etc.)
                 // sh 'mvn test'
             }
         }
@@ -26,7 +26,7 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 echo 'Performing code analysis using SonarQube...'
-                // Uncomment and adjust as needed
+                // Example command for code analysis (using SonarQube)
                 // sh 'mvn sonar:sonar'
             }
         }
@@ -34,7 +34,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo 'Scanning for vulnerabilities using OWASP Dependency-Check...'
-                // Uncomment and adjust as needed
+                // Example command to perform a security scan
                 // sh 'dependency-check.sh --project your-project-name --out .'
             }
         }
@@ -42,7 +42,7 @@ pipeline {
         stage('Deploy to Staging') {
             steps {
                 echo 'Deploying the application to the staging server...'
-                // Uncomment and adjust as needed
+                // Example command to deploy to a staging environment
                 // sh 'aws deploy ...'
             }
         }
@@ -50,7 +50,7 @@ pipeline {
         stage('Integration Tests on Staging') {
             steps {
                 echo 'Running integration tests in the staging environment...'
-                // Uncomment and adjust as needed
+                // Example command to run integration tests
                 // sh 'mvn verify'
             }
         }
@@ -58,7 +58,7 @@ pipeline {
         stage('Deploy to Production') {
             steps {
                 echo 'Deploying the application to the production server...'
-                // Uncomment and adjust as needed
+                // Example command to deploy to a production environment
                 // sh 'aws deploy ...'
             }
         }
@@ -66,12 +66,11 @@ pipeline {
 
     post {
         always {
-            // Archive all log files in the workspace
+            // Archive log files (if any)
             archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
         }
         success {
             script {
-                echo 'Sending success email...'
                 emailext (
                     subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                     body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
@@ -82,7 +81,6 @@ pipeline {
         }
         failure {
             script {
-                echo 'Sending failure email...'
                 emailext (
                     subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                     body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",

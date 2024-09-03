@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Set the email notification recipients
-        EMAIL_RECIPIENTS = '305ci2021@gmail.com'
+        EMAIL_RECIPIENTS = 'danidukarunarathne@gmail.com'
     }
 
     stages {

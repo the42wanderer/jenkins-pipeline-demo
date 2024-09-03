@@ -63,27 +63,26 @@ pipeline {
             }
         }
     }
-    post {
-    always {
-        archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
-    }
-    success {
-        emailext (
-            subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-            body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
-            to: "${env.EMAIL_RECIPIENTS}",
-            attachmentsPattern: '**/*.log'
-        )
-    }
-    failure {
-        emailext (
-            subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-            body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
-            to: "${env.EMAIL_RECIPIENTS}",
-            attachmentsPattern: '**/*.log'
-        )
-    }
-}
 
+    post {
+        always {
+            archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
+        }
+        success {
+            emailext (
+                subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                attachmentsPattern: '**/*.log'
+            )
+        }
+        failure {
+            emailext (
+                subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                attachmentsPattern: '**/*.log'
+            )
+        }
     }
 }

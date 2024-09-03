@@ -66,21 +66,24 @@ pipeline {
 
     post {
         always {
+            // Archive all log files in the workspace
             archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
         }
         success {
+            // Send email on success
             emailext (
                 subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                 body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                to: "${env.EMAIL_RECIPIENTS}",
                 attachmentsPattern: '**/*.log'
             )
         }
         failure {
+            // Send email on failure
             emailext (
                 subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                 body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                to: "${env.EMAIL_RECIPIENTS}",
                 attachmentsPattern: '**/*.log'
             )
         }

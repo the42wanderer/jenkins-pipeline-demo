@@ -10,7 +10,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the code using Maven...'
-                // Example command to build the project with Maven
+                // Uncomment and adjust as needed
                 // sh 'mvn clean package'
             }
         }
@@ -18,7 +18,7 @@ pipeline {
         stage('Unit and Integration Tests') {
             steps {
                 echo 'Running unit and integration tests...'
-                // Example command to run tests (JUnit, TestNG, etc.)
+                // Uncomment and adjust as needed
                 // sh 'mvn test'
             }
         }
@@ -26,7 +26,7 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 echo 'Performing code analysis using SonarQube...'
-                // Example command for code analysis (using SonarQube)
+                // Uncomment and adjust as needed
                 // sh 'mvn sonar:sonar'
             }
         }
@@ -34,7 +34,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo 'Scanning for vulnerabilities using OWASP Dependency-Check...'
-                // Example command to perform a security scan
+                // Uncomment and adjust as needed
                 // sh 'dependency-check.sh --project your-project-name --out .'
             }
         }
@@ -42,7 +42,7 @@ pipeline {
         stage('Deploy to Staging') {
             steps {
                 echo 'Deploying the application to the staging server...'
-                // Example command to deploy to an AWS EC2 instance
+                // Uncomment and adjust as needed
                 // sh 'aws deploy ...'
             }
         }
@@ -50,7 +50,7 @@ pipeline {
         stage('Integration Tests on Staging') {
             steps {
                 echo 'Running integration tests in the staging environment...'
-                // Example command to run integration tests
+                // Uncomment and adjust as needed
                 // sh 'mvn verify'
             }
         }
@@ -58,7 +58,7 @@ pipeline {
         stage('Deploy to Production') {
             steps {
                 echo 'Deploying the application to the production server...'
-                // Example command to deploy to a production AWS EC2 instance
+                // Uncomment and adjust as needed
                 // sh 'aws deploy ...'
             }
         }
@@ -70,22 +70,26 @@ pipeline {
             archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
         }
         success {
-            // Send email on success
-            emailext (
-                subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
-                to: "${env.EMAIL_RECIPIENTS}",
-                attachmentsPattern: '**/*.log'
-            )
+            script {
+                echo 'Sending success email...'
+                emailext (
+                    subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                    body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
+                    to: "${env.EMAIL_RECIPIENTS}",
+                    attachmentsPattern: '**/*.log'
+                )
+            }
         }
         failure {
-            // Send email on failure
-            emailext (
-                subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
-                to: "${env.EMAIL_RECIPIENTS}",
-                attachmentsPattern: '**/*.log'
-            )
+            script {
+                echo 'Sending failure email...'
+                emailext (
+                    subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                    body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
+                    to: "${env.EMAIL_RECIPIENTS}",
+                    attachmentsPattern: '**/*.log'
+                )
+            }
         }
     }
 }

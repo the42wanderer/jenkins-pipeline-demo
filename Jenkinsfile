@@ -71,22 +71,42 @@ pipeline {
         }
         success {
             script {
-                emailext (
-                    subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                    body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
-                    to: "${env.EMAIL_RECIPIENTS}",
-                    attachmentsPattern: '**/*.log'
-                )
+                // Attempt to send email using emailext
+                try {
+                    emailext (
+                        subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
+                        to: "${env.EMAIL_RECIPIENTS}",
+                        attachmentsPattern: '**/*.log'
+                    )
+                } catch (Exception e) {
+                    // Fallback to the basic mail command if emailext fails
+                    mail (
+                        subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
+                        to: "${env.EMAIL_RECIPIENTS}"
+                    )
+                }
             }
         }
         failure {
             script {
-                emailext (
-                    subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                    body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
-                    to: "${env.EMAIL_RECIPIENTS}",
-                    attachmentsPattern: '**/*.log'
-                )
+                // Attempt to send email using emailext
+                try {
+                    emailext (
+                        subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
+                        to: "${env.EMAIL_RECIPIENTS}",
+                        attachmentsPattern: '**/*.log'
+                    )
+                } catch (Exception e) {
+                    // Fallback to the basic mail command if emailext fails
+                    mail (
+                        subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
+                        to: "${env.EMAIL_RECIPIENTS}"
+                    )
+                }
             }
         }
     }

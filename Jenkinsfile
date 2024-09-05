@@ -1,113 +1,117 @@
 pipeline {
     agent any
-
     environment {
-        // Set the email notification recipients
-        EMAIL_RECIPIENTS = 'danidukarunarathne@gmail.com'
+        EMAIL_RECIPIENTS = 'danidukarunarathne@gmail.com, 305ci2021@gmail.com'
     }
 
     stages {
         stage('Build') {
             steps {
                 echo 'Building the code using Maven...'
-                // Example command to build the project with Maven
-                // sh 'mvn clean package'
+                echo 'Tool: Maven'
             }
         }
 
         stage('Unit and Integration Tests') {
             steps {
-                echo 'Running unit and integration tests...'
-                // Example command to run tests (JUnit, TestNG, etc.)
-                // sh 'mvn test'
+                echo 'Running unit tests with JUnit and integration tests...'
+                echo 'Tools: JUnit for unit tests, TestNG for integration tests'
+            }
+            post {
+                success {
+                    mail (
+                        subject: "Unit and Integration Tests SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Unit and integration tests passed successfully.",
+                        to: "${env.EMAIL_RECIPIENTS}",
+                        attachmentsPattern: '**/*.log'
+                    )
+                }
+                failure {
+                    mail (
+                        subject: "Unit and Integration Tests FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Unit and integration tests failed.",
+                        to: "${env.EMAIL_RECIPIENTS}",
+                        attachmentsPattern: '**/*.log'
+                    )
+                }
             }
         }
 
         stage('Code Analysis') {
             steps {
-                echo 'Performing code analysis using SonarQube...'
-                // Example command for code analysis (using SonarQube)
-                // sh 'mvn sonar:sonar'
+                echo 'Performing code analysis with SonarQube...'
+                echo 'Tool: SonarQube'
             }
         }
 
         stage('Security Scan') {
             steps {
-                echo 'Scanning for vulnerabilities using OWASP Dependency-Check...'
-                // Example command to perform a security scan
-                // sh 'dependency-check.sh --project your-project-name --out .'
+                echo 'Running security scan using OWASP Dependency-Check...'
+                echo 'Tool: OWASP Dependency-Check'
+            }
+            post {
+                success {
+                    mail (
+                        subject: "Security Scan SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Security scan passed successfully.",
+                        to: "${env.EMAIL_RECIPIENTS}",
+                        attachmentsPattern: '**/*.log'
+                    )
+                }
+                failure {
+                    mail (
+                        subject: "Security Scan FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Security scan failed.",
+                        to: "${env.EMAIL_RECIPIENTS}",
+                        attachmentsPattern: '**/*.log'
+                    )
+                }
             }
         }
 
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying the application to the staging server...'
-                // Example command to deploy to a staging environment
-                // sh 'aws deploy ...'
+                echo 'Deploying the application to staging (e.g., AWS EC2 instance)...'
+                echo 'Tool: AWS CLI'
             }
         }
 
         stage('Integration Tests on Staging') {
             steps {
                 echo 'Running integration tests in the staging environment...'
-                // Example command to run integration tests
-                // sh 'mvn verify'
+                echo 'Tool: Selenium for testing'
             }
         }
 
         stage('Deploy to Production') {
             steps {
-                echo 'Deploying the application to the production server...'
-                // Example command to deploy to a production environment
-                // sh 'aws deploy ...'
+                echo 'Deploying the application to production (e.g., AWS EC2 instance)...'
+                echo 'Tool: AWS CLI'
             }
         }
     }
 
     post {
         always {
-            // Archive log files (if any)
             archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
         }
+
         success {
-            script {
-                // Attempt to send email using emailext
-                try {
-                    emailext (
-                        subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                        body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
-                        to: "${env.EMAIL_RECIPIENTS}",
-                        attachmentsPattern: '**/*.log'
-                    )
-                } catch (Exception e) {
-                    // Fallback to the basic mail command if emailext fails
-                    mail (
-                        subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                        body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
-                        to: "${env.EMAIL_RECIPIENTS}"
-                    )
-                }
-            }
+            mail (
+                subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
+                to: "${env.EMAIL_RECIPIENTS}",
+                attachmentsPattern: '**/*.log'
+            )
         }
+
         failure {
-            script {
-                // Attempt to send email using emailext
-                try {
-                    emailext (
-                        subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                        body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
-                        to: "${env.EMAIL_RECIPIENTS}",
-                        attachmentsPattern: '**/*.log'
-                    )
-                } catch (Exception e) {
-                    // Fallback to the basic mail command if emailext fails
-                    mail (
-                        subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                        body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
-                        to: "${env.EMAIL_RECIPIENTS}"
-                    )
-                }
-            }
+            mail (
+                subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
+                to: "${env.EMAIL_RECIPIENTS}",
+                attachmentsPattern: '**/*.log'
+            )
         }
     }
 }

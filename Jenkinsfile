@@ -19,19 +19,21 @@ pipeline {
             }
             post {
                 success {
+                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
                     mail (
                         subject: "Unit and Integration Tests SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                        body: "Unit and integration tests passed successfully.",
+                        body: "Unit and integration tests passed successfully. Please check the attached logs.",
                         to: "${env.EMAIL_RECIPIENTS}",
-                        attachmentsPattern: '**/*.log'
+                        attachments: '**/*.log'
                     )
                 }
                 failure {
+                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
                     mail (
                         subject: "Unit and Integration Tests FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                        body: "Unit and integration tests failed.",
+                        body: "Unit and integration tests failed. Please check the attached logs.",
                         to: "${env.EMAIL_RECIPIENTS}",
-                        attachmentsPattern: '**/*.log'
+                        attachments: '**/*.log'
                     )
                 }
             }
@@ -51,19 +53,21 @@ pipeline {
             }
             post {
                 success {
+                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
                     mail (
                         subject: "Security Scan SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                        body: "Security scan passed successfully.",
+                        body: "Security scan passed successfully. Please check the attached logs.",
                         to: "${env.EMAIL_RECIPIENTS}",
-                        attachmentsPattern: '**/*.log'
+                        attachments: '**/*.log'
                     )
                 }
                 failure {
+                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
                     mail (
                         subject: "Security Scan FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
-                        body: "Security scan failed.",
+                        body: "Security scan failed. Please check the attached logs.",
                         to: "${env.EMAIL_RECIPIENTS}",
-                        attachmentsPattern: '**/*.log'
+                        attachments: '**/*.log'
                     )
                 }
             }
@@ -100,8 +104,7 @@ pipeline {
             mail (
                 subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                 body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
-                to: "${env.EMAIL_RECIPIENTS}",
-                attachmentsPattern: '**/*.log'
+                to: "${env.EMAIL_RECIPIENTS}"
             )
         }
 
@@ -109,8 +112,7 @@ pipeline {
             mail (
                 subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                 body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed.",
-                to: "${env.EMAIL_RECIPIENTS}",
-                attachmentsPattern: '**/*.log'
+                to: "${env.EMAIL_RECIPIENTS}"
             )
         }
     }

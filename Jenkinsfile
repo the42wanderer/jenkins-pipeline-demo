@@ -119,7 +119,26 @@ pipeline {
 
     post {
         always {
+            // Archive all logs
             archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
+        }
+
+        success {
+            emailext (
+                subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: "The entire pipeline for Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded. You can find the logs attached.",
+                to: "${env.EMAIL_RECIPIENTS}",
+                attachmentsPattern: '**/*.log'  // Attach all log files
+            )
+        }
+
+        failure {
+            emailext (
+                subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: "The entire pipeline for Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed. Please check the logs for more details.",
+                to: "${env.EMAIL_RECIPIENTS}",
+                attachmentsPattern: '**/*.log'  // Attach all log files
+            )
         }
     }
 }

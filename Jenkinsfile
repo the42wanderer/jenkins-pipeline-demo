@@ -16,24 +16,26 @@ pipeline {
             steps {
                 echo 'Running unit tests with JUnit and integration tests...'
                 echo 'Tools: JUnit for unit tests, TestNG for integration tests'
+                // Save the log file from this stage
+                sh 'echo "This is the log for Unit and Integration Tests" > unit_integration_test.log'
             }
             post {
                 success {
-                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
-                    mail (
+                    archiveArtifacts artifacts: 'unit_integration_test.log', allowEmptyArchive: true
+                    emailext (
                         subject: "Unit and Integration Tests SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                         body: "Unit and integration tests passed successfully.",
                         to: "${env.EMAIL_RECIPIENTS}",
-                        attachLog: true  // Attach the build log to the email
+                        attachmentsPattern: 'unit_integration_test.log'
                     )
                 }
                 failure {
-                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
-                    mail (
+                    archiveArtifacts artifacts: 'unit_integration_test.log', allowEmptyArchive: true
+                    emailext (
                         subject: "Unit and Integration Tests FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                         body: "Unit and integration tests failed. Please check the logs.",
                         to: "${env.EMAIL_RECIPIENTS}",
-                        attachLog: true  // Attach the build log to the email
+                        attachmentsPattern: 'unit_integration_test.log'
                     )
                 }
             }
@@ -43,6 +45,28 @@ pipeline {
             steps {
                 echo 'Performing code analysis with SonarQube...'
                 echo 'Tool: SonarQube'
+                // Save the log file for this stage
+                sh 'echo "This is the log for Code Analysis" > code_analysis.log'
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'code_analysis.log', allowEmptyArchive: true
+                    emailext (
+                        subject: "Code Analysis SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Code analysis passed successfully.",
+                        to: "${env.EMAIL_RECIPIENTS}",
+                        attachmentsPattern: 'code_analysis.log'
+                    )
+                }
+                failure {
+                    archiveArtifacts artifacts: 'code_analysis.log', allowEmptyArchive: true
+                    emailext (
+                        subject: "Code Analysis FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "Code analysis failed. Please check the logs.",
+                        to: "${env.EMAIL_RECIPIENTS}",
+                        attachmentsPattern: 'code_analysis.log'
+                    )
+                }
             }
         }
 
@@ -50,24 +74,26 @@ pipeline {
             steps {
                 echo 'Running security scan using OWASP Dependency-Check...'
                 echo 'Tool: OWASP Dependency-Check'
+                // Save the log file for this stage
+                sh 'echo "This is the log for Security Scan" > security_scan.log'
             }
             post {
                 success {
-                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
-                    mail (
+                    archiveArtifacts artifacts: 'security_scan.log', allowEmptyArchive: true
+                    emailext (
                         subject: "Security Scan SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                         body: "Security scan passed successfully.",
                         to: "${env.EMAIL_RECIPIENTS}",
-                        attachLog: true  // Attach the build log to the email
+                        attachmentsPattern: 'security_scan.log'
                     )
                 }
                 failure {
-                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true
-                    mail (
+                    archiveArtifacts artifacts: 'security_scan.log', allowEmptyArchive: true
+                    emailext (
                         subject: "Security Scan FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                         body: "Security scan failed. Please check the logs.",
                         to: "${env.EMAIL_RECIPIENTS}",
-                        attachLog: true  // Attach the build log to the email
+                        attachmentsPattern: 'security_scan.log'
                     )
                 }
             }
@@ -101,20 +127,20 @@ pipeline {
         }
 
         success {
-            mail (
+            emailext (
                 subject: "SUCCESS: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                 body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] succeeded.",
                 to: "${env.EMAIL_RECIPIENTS}",
-                attachLog: true  // Attach the build log to the email
+                attachmentsPattern: '**/*.log'  // Attach all log files
             )
         }
 
         failure {
-            mail (
+            emailext (
                 subject: "FAILURE: Jenkins Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                 body: "Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] failed. Please check the logs.",
                 to: "${env.EMAIL_RECIPIENTS}",
-                attachLog: true  // Attach the build log to the email
+                attachmentsPattern: '**/*.log'  // Attach all log files
             )
         }
     }
